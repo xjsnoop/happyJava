@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+<!--    <context:property-placeholder location="classpath:jdbc.properties"></context:property-placeholder>-->
+    <!--        配置C3P0的注入,通过加载外部jdbc配置文件-->
+    <bean id="dataSource-C3P0" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"></property>
+        <property name="jdbcUrl" value="${jdbc.url}"></property>
+        <property name="user" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+    <!--        配置C3P0的注入-->
+<!--    <bean id="dataSource-C3P0" class="com.mchange.v2.c3p0.ComboPooledDataSource">-->
+<!--        <property name="driverClass" value="com.mysql.jdbc.Driver"></property>-->
+<!--        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/db1"></property>-->
+<!--        <property name="user" value="root"></property>-->
+<!--        <property name="password" value="xj"></property>-->
+<!--    </bean>-->
+<!--        配置druid的注入-->
+    <bean id="dataSource-Druid" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+        <property name="url" value="jdbc:mysql://localhost:3306/db1"></property>
+        <property name="username" value="root"></property>
+        <property name="password" value="xj"></property>
+    </bean>
+    <!--    配置组件扫描-->
+    <context:component-scan base-package="cn.xujian"></context:component-scan>
+</beans>
