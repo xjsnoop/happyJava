@@ -1094,7 +1094,26 @@ TransactionStatus接口
 
 Spring声明式事务控制底层是AOP
 
-
+```java
+<!--    配置平台事务管理器-->
+    <bean id="transactionManage" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource-druid"></property>
+    </bean>
+<!--    通知，事务的增强-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManage">
+<!--    设置事务的属性信息    -->
+        <tx:attributes>
+<!--    对不同的方法配置不同的事务参数-->
+            <!--  name ：切点方法的名称     isolation ：事务的隔离级别 propogation：事务的传播行为 
+            	timeout ：超时时间  read-only ：是否只读-->
+            <tx:method name="transfer" isolation="DEFAULT" propagation="REQUIRED" timeout="-1" read-only="false"/>
+        </tx:attributes>
+    </tx:advice>
+<!--    配置事务aop的织入-->
+    <aop:config>
+        <aop:advisor advice-ref="txAdvice" pointcut="execution(* cn.xujian.service.impl.*.*(..))"></aop:advisor>
+    </aop:config>
+```
 
 #### 基于注解的声明式事务控制
 

@@ -2,8 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
     <context:property-placeholder location="classpath:jdbc.properties"></context:property-placeholder>
 <!--    注入数据库连接池-->
     <bean id="dataSource-druid" class="com.alibaba.druid.pool.DruidDataSource">
@@ -17,11 +21,28 @@
         <property name="dataSource" ref="dataSource-druid"></property>
     </bean>
 <!--    注入accountDaoImpl类-->
-    <bean id="accountDaoImpl" class="cn.xujian.dao.impl.AccountDaoImpl">
+    <bean id="accountDao" class="cn.xujian.dao.impl.AccountDaoImpl">
         <property name="jdbcTemplate" ref="jdbcTemplate"></property>
     </bean>
 <!--    注入AccountService类-->
-    <bean id="accountServiceImpl" class="cn.xujian.service.impl.AccountServiceImpl">
-        <property name="accountDao" ref="accountDaoImpl"></property>
+    <bean id="accountService" class="cn.xujian.service.impl.AccountServiceImpl">
+        <property name="accountDao" ref="accountDao"></property>
     </bean>
+
+<!--    配置平台事务管理器-->
+    <bean id="transactionManage" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource-druid"></property>
+    </bean>
+<!--    通知，事务的增强-->
+    <tx:advice id="txAdvice" transaction-manager="transactionManage">
+<!--    设置事务的属性信息    -->
+        <tx:attributes>
+<!--    对不同的方法配置不同的事务参数-->
+            <tx:method name="transfer" isolation="DEFAULT" propagation="REQUIRED" timeout="-1" read-only="false"/>
+        </tx:attributes>
+    </tx:advice>
+<!--    配置事务aop的织入-->
+    <aop:config>
+        <aop:advisor advice-ref="txAdvice" pointcut="execution(* cn.xujian.service.impl.*.*(..))"></aop:advisor>
+    </aop:config>
 </beans>
