@@ -35,8 +35,10 @@
     </bean>
 <!--    通知，事务的增强-->
     <tx:advice id="txAdvice" transaction-manager="transactionManage">
+<!--    设置事务的属性信息    -->
         <tx:attributes>
-            <tx:method name="*"/>
+<!--    对不同的方法配置不同的事务参数-->
+            <tx:method name="transfer" isolation="DEFAULT" propagation="REQUIRED" timeout="-1" read-only="false"/>
         </tx:attributes>
     </tx:advice>
 <!--    配置事务aop的织入-->

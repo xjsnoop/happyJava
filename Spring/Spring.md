@@ -1117,3 +1117,278 @@ Spring声明式事务控制底层是AOP
 
 #### 基于注解的声明式事务控制
 
+```java
+
+@Service("accountService")
+public class AccountServiceImpl implements AccountService {
+    @Autowired
+    private AccountDao accountDao;
+
+    @Override
+//    给方法加事务
+    @Transactional(isolation = Isolation.READ_COMMITTED,propagation = Propagation.REQUIRED)
+    public void transfer(String inMan, String outMan, double money) {
+        accountDao.in(inMan,money);
+//        int i = 1/0;
+        accountDao.out(outMan,money);
+
+
+    }
+}
+```
+
+```java
+<!--    读取配置文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"></context:property-placeholder>
+<!--    组件扫描-->
+    <context:component-scan base-package="cn.xujian"></context:component-scan>
+<!--    注入数据库连接池-->
+    <bean id="dataSource-druid" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+<!--    注入jdbc模板类-->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource-druid"></property>
+    </bean>
+
+<!--    配置平台事务管理器-->
+    <bean id="transactionManage" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource-druid"></property>
+    </bean>
+<!--    事务的注解驱动-->
+    <tx:annotation-driven transaction-manager="transactionManage"></tx:annotation-driven>
+
+</beans>
+```
+
+- ==平台事务管理器配置==
+
+- ==事务的注解驱动配置==
+
+- ==事务的通知配置==
+
+
+
+
+
+### Spring集成Web环境
+
+ApplicationContext应用上下文获取方式：web项目中，使用ServletContextListener监听Web应用的启动，启动时加载spring配置文件，创建ApplicationContext对象，将其存储到最大的域ServletContext，这样便可从任意位置域中获得应用上下文ApplicationContext对象。
+
+Spring提供的获取应用上下文的工具：  spring提供了ContextLoaderListener就是对上述功能的封装，提供了一个客户端工具WebApplicationContextUtil供使用者获得上下文对象。
+
+1. 在web.xml中配置ContextLoaderListener监听器（导入spring-web包）
+2. 使用WebApplicationContextUtil获取上下文对象
+
+#### 快速入门
+
+1. 导入SpringMVC包（此处要注意导入的所有spring的包版本一致，否则会导致注入bean错误）
+
+   ```java
+   <dependency>
+     <groupId>org.springframework</groupId>
+     <artifactId>spring-webmvc</artifactId>
+     <version>5.2.6.RELEASE</version>
+   </dependency>
+   ```
+
+2. 配置SpringMVC核心控制器DispathcerServlet（在web.xml中配置）
+
+   ```java
+   <!--  配置SpringMVC的前端控制器-->
+     <servlet>
+       <servlet-name>DispatcherServlet</servlet-name>
+       <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+   <!--    servlet初始化的时候加载配置文件-->
+       <init-param>
+         <param-name>contextConfigLocation</param-name>
+         <param-value>classpath:spring-mvc.xml</param-value>
+       </init-param>
+       <load-on-startup>1</load-on-startup>
+     </servlet>
+     <servlet-mapping>
+       <servlet-name>DispatcherServlet</servlet-name>
+       <url-pattern>/</url-pattern>
+     </servlet-mapping>
+   ```
+
+3. 创建Controller类和示图页面
+
+   ```java
+   @Controller
+   public class UserController {
+       //业务方法映射地址
+       @RequestMapping("/quick")
+       public String saves(){
+           System.out.println("Controller save running");
+           //此处return的为要跳转的示图
+           return "success.jsp";
+       }
+   }
+   ```
+
+4. 使用注解配置Controller类中业务方法的映射地址
+
+5. 配置SpringMVC核心文件spring-mvc.xml（spring的配置）
+
+6. ```java
+   <?xml version="1.0" encoding="UTF-8"?>
+   <beans xmlns="http://www.springframework.org/schema/beans"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:context="http://www.springframework.org/schema/context"
+          xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                               http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+   <!--Controller的组件扫描-->
+       <context:component-scan base-package="cn.xujian.controller"></context:component-scan>
+   </beans>
+   ```
+
+7. 客户端发起请求测试
+
+![SpringMVC_工作流程| Catnip](https://c-catnip.github.io/2019/08/19/%E5%90%8E%E7%AB%AF/SpringMVC/SpringMVC_%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B/SpringMVC%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B%E5%9B%BE.png)
+
+
+
+注解：@requestMapping可以用在==类上==（请求的一级目录）和==方法上==（请求的二级目录），
+
+​			属性：value   请求地址               method   请求方式        params    用于指定限制请求参数的条件
+
+#### SpringMVC的数据响应
+
+##### 页面跳转
+
+###### 直接返回字符串
+
+```java
+@Controller
+public class UserController {
+    @RequestMapping(value = "/quick",method = RequestMethod.GET)
+    public String saves(){
+        System.out.println("Controller save running");
+        //此处return的为要跳转的示图
+        return "success.jsp";
+    }
+```
+
+###### 通过ModelAndView对象返回：
+
+- 方法1
+
+```java
+//使用ModelAndView最基本的操作
+@RequestMapping(value = "/quick2",method = RequestMethod.GET)
+public ModelAndView saves2(){
+    /*
+    * Model :模型用于封装数据
+    * View  :视图用于展示数据
+    *  */
+    ModelAndView modelAndView = new ModelAndView();
+    //设置模型数据
+    modelAndView.addObject("username","xujian");
+    //设置视图名称
+    modelAndView.setViewName("success.jsp");
+   return modelAndView;
+}
+```
+
+- 方法2
+
+```java
+//由spring容器提供modelAndView对象
+@RequestMapping(value = "/quick3")
+public ModelAndView saves3(ModelAndView modelAndView){
+    //设置模型数据
+    modelAndView.addObject("username","quick3");
+    //设置视图名称
+    modelAndView.setViewName("success.jsp");
+    return modelAndView;
+}
+```
+
+- 方法3
+
+```java
+//model和view分开
+@RequestMapping(value = "/quick4")
+public String saves4(Model model){
+    //设置模型数据
+    model.addAttribute("username","quick4");
+    //此处return的为要跳转的示图
+    return "success.jsp";
+}
+```
+
+##### 回写数据
+
+###### 直接返回字符串
+
+- 方法1
+
+```java
+//最基本的利用httpServletResponse对象回写
+@RequestMapping("/quick5")
+public void saves5(HttpServletResponse httpServletResponse) throws IOException {
+    httpServletResponse.getWriter().write("hello xujian");
+}
+```
+
+- 方法2（重点）
+
+```java
+//将需要回写的字符串直接返回，通过@ResponseBody注解告知SpringMVC框架，方法返回的字符串不是跳转，是直接在http响应体中返回。
+@RequestMapping("/quick6")
+@ResponseBody
+public String saves6(){
+    return "hello quick6";
+}
+```
+
+- 回写Json格式字符串
+
+```java
+//将对象转换为json字符串然后响应
+@RequestMapping("/quick7")
+@ResponseBody
+public String saves7() throws JsonProcessingException {
+    User user = new User("lisi",18);  //如果有中文需要处理编码格式
+    //使用json的转换工具将对象转换成json格式的字符串再返回，（导包jackson-annotations、jackson-databind、jackson-core）
+    ObjectMapper objectMapper = new ObjectMapper();
+    String json = objectMapper.writeValueAsString(user);
+    return json;
+}
+```
+
+###### 返回对象或集合
+
+```java
+<!--    配置处理器映射器-->
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"></bean>
+            </list>
+        </property>
+    </bean>
+```
+
+```java
+<!--    MVC的注解驱动-->
+    <mvc:annotation-driven></mvc:annotation-driven>
+```
+
+可用==mvc的注解驱动==来替代==配置处理映射器==，达到相同的json转换效果
+
+```java
+//期望SpringMVC自动将User转换成json格式的字符串
+@RequestMapping("/quick8")
+@ResponseBody
+public User saves8()  {
+    User user = new User("zhangshan",18);
+    return user;
+}
+```
+
+#### springMVC的数据请求

@@ -3,12 +3,16 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/Spring_Jdbc/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Spring_Jdbc/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Spring_MVC01/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Spring_MVC01/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Spring_Transaction/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Spring_Transaction/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Spring_aop/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Spring_aop/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Spring_ioc/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Spring_ioc/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Spring_transaction_tx_anno/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Spring_transaction_tx_anno/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring_ioc_anno/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/spring_ioc_anno/src/main/resources" charset="UTF-8" />
   </component>

@@ -6,11 +6,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Spring_Transaction" />
+        <module name="Spring_transaction_tx_anno" />
         <module name="Spring_ioc" />
+        <module name="Spring_MVC01" />
         <module name="spring_ioc_anno" />
-        <module name="Spring_aop" />
+        <module name="Spring_Transaction" />
         <module name="Spring_Jdbc" />
+        <module name="Spring_aop" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="11">
@@ -18,7 +20,10 @@
       <module name="Spring_ioc" target="1.7" />
       <module name="spring_ioc_anno" target="1.7" />
       <module name="Spring_Jdbc" target="1.7" />
+      <module name="Spring_MVC" target="1.7" />
+      <module name="Spring_MVC01" target="1.7" />
       <module name="Spring_Transaction" target="1.7" />
+      <module name="Spring_transaction_tx_anno" target="1.7" />
     </bytecodeTargetLevel>
   </component>
 </project>

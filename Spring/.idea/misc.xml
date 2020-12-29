@@ -3,6 +3,7 @@
   <component name="FrameworkDetectionExcludesConfiguration">
     <file type="web" url="file://$PROJECT_DIR$/Spring_ioc" />
     <file type="web" url="file://$PROJECT_DIR$/spring_ioc_anno" />
+    <file type="web" url="file://$PROJECT_DIR$/Spring_MVC01" />
   </component>
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
@@ -15,6 +16,8 @@
         <option value="$PROJECT_DIR$/spring_ioc_anno/pom.xml" />
         <option value="$PROJECT_DIR$/Spring_Jdbc/pom.xml" />
         <option value="$PROJECT_DIR$/Spring_Transaction/pom.xml" />
+        <option value="$PROJECT_DIR$/Spring_transaction_tx_anno/pom.xml" />
+        <option value="$PROJECT_DIR$/Spring_MVC01/pom.xml" />
       </list>
     </option>
   </component>
