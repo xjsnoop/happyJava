@@ -1,18 +1,21 @@
 package cn.xujian.controller;
 
 import cn.xujian.domain.User;
+import cn.xujian.domain.VO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -89,4 +92,74 @@ public class UserController {
         User user = new User("zhangshan",18);
         return user;
     }
+
+    //SpringMVC获取请求参数
+
+    //获得基本类型参数
+    @RequestMapping("/quick9")
+    @ResponseBody
+    public void saves9(String username)  {
+        System.out.println(username);
+    }
+
+    //获取POJO类型参数
+    @RequestMapping("/quick10")
+    @ResponseBody
+    public void saves10(User user)  {
+        System.out.println(user);
+    }
+
+    //获取数组参数
+    @RequestMapping("/quick11")
+    @ResponseBody
+    public void saves11(String[] strs,String[] strs1)  {
+        System.out.println(Arrays.asList(strs));
+        System.out.println(Arrays.asList(strs1));
+    }
+
+    //获取集合类型参数
+    @RequestMapping("/quick12")
+    @ResponseBody
+    public void saves12(VO vo)  {
+        System.out.println(vo);
+    }
+
+    //获取集合类型参数(特殊情况)
+    @RequestMapping("/quick13")
+    @ResponseBody
+    public void saves13(@RequestBody List<User> userList)  {
+        System.out.println(userList);
+    }
+
+    //参数绑定注解@RequestParam
+    @RequestMapping("/quick14")
+    @ResponseBody
+    public void saves14(@RequestParam("name") String username)  {
+        System.out.println(username);
+    }
+
+    //获得Restful风格的参数
+    @RequestMapping(value = "/quick15/{name}",method = RequestMethod.GET)
+    @ResponseBody
+    public void saves15(@PathVariable(value = "name", required = true) String username){
+        System.out.println(username);
+    }
+
+    //自定义格式转换
+    @RequestMapping("/quick16")
+    @ResponseBody
+    public void saves16(Date date){
+        System.out.println(date);
+    }
+
+    //获得请求头
+    @RequestMapping("/quick17")
+    @ResponseBody
+    //@RequestHeader注解的value对应请求头里的属性名
+    public void saves17(@RequestHeader(value = "User-Agent") String user_agent){
+        System.out.println(user_agent);
+    }
 }
+
+
+

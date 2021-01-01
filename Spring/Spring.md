@@ -1391,4 +1391,274 @@ public User saves8()  {
 }
 ```
 
-#### springMVC的数据请求
+
+
+
+
+#### springMVC获得请求数据
+
+服务器端获得请求的数据，有时需要进行数据的封装，SpringMVC可以接收如下类型的参数：
+
+- 基本类型参数
+- POJO类型参数
+- 数组类型参数
+- 集合类型参数
+
+###### 
+
+##### 获取基本类型数据
+
+Controller中的业务方法的参数名称要与请求参数的name一致，参数值会自动映射匹配。
+
+在客户端访问 ：http://localhost:8989/quick9?username=lisi
+
+```java
+//获得基本类型参数
+@RequestMapping("/quick9")
+@ResponseBody
+public void saves9(String username)  {
+    System.out.println(username);
+}
+```
+
+##### 获得POJO类型数据
+
+Controller中的业务方法的POJO参数的属性名要与请求参数的name一致，参数值会自动映射匹配。
+
+在客户端访问：http://localhost:8989/quick10?username=xujian&age=26
+
+```java
+//获取POJO类型参数
+@RequestMapping("/quick10")
+@ResponseBody
+public void saves10(User user)  {
+    System.out.println(user);
+}
+```
+
+##### 获得数组类型的参数
+
+Controller中的业务方法的数组名称与请求参数的name一致，参数值会自动映射匹配。
+
+在客户端访问：http://localhost:8989/quick11?strs=aaa&strs=bbb&strs=ccc
+
+```java
+//获取数组参数
+@RequestMapping("/quick11")
+@ResponseBody
+public void saves11(String[] strs)  {
+    System.out.println(Arrays.asList(strs));
+}
+```
+
+##### 获取集合类型参数
+
+获得集合参数时，要将集合参数包装到POJO对象当中
+
+- 创建POJO对象
+
+```java
+public class VO {
+    private List<User> userList;
+
+    public List<User> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
+    }
+```
+
+- 创建post请求
+
+```java
+    <form action="${pageContext.request.contextPath}/quick12" method="post">
+<%--        表明是第几个user对象的username--%>
+        <input type="text" name="userList[0].username">
+        <input type="text" name="userList[0].age">
+        <input type="text" name="userList[1].username">
+        <input type="text" name="userList[1].age">
+        <input type="submit" value="提交">
+    </form>
+```
+
+- 获取集合类型参数
+
+```java
+//获取集合类型参数
+@RequestMapping("/quick12")
+@ResponseBody
+public void saves12(VO vo)  {
+    System.out.println(vo);
+}
+```
+
+
+
+==特殊业务场景==
+
+当使用ajax提交时，可以指定contentType为json形式，那么在方法参数位置使用@RequestBody注解可以直接接收集合数据而无需使用POJO进行包装。（此处遇到找不到js资源的问题，maven重新编驿解决）
+
+- js的开发资源开放访问（二选一）
+
+```java
+<!--&lt;!&ndash;开发资源开放访问&ndash;&gt;-->
+<!--    <mvc:resources mapping="/js/**" location="/js/"></mvc:resources>-->
+<!--    如果spring找不到资源，交给原始的容器（tomcat）去找资源-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+```
+
+- 异步请求
+
+```java
+<script src="${pageContext.request.contextPath}/js/jquery-3.3.1.js"></script>
+<script>
+    var userList = new Array();
+    userList.push({username:"zhangshan",age:18});
+    userList.push({username:"lisi",age:55});
+    $.ajax({
+        type:"post",
+        url:"${pageContext.request.contextPath}/quick13",
+        data:JSON.stringify(userList),
+        contentType:"application/json;charset=utf-8"
+    })
+</script>
+```
+
+- controller（方法参数位置使用@RequestBody注解）
+
+```java
+//获取集合类型参数(特殊情况)
+@RequestMapping("/quick13")
+@ResponseBody
+public void saves13(@RequestBody List<User> userList)  {
+    System.out.println(userList);
+}
+```
+
+##### 获得请求头
+
+使用注解@RequestHeader
+
+```java
+//获得请求头
+@RequestMapping("/quick17")
+@ResponseBody
+//@RequestHeader注解的value对应请求头里的属性名；使用@CookieValue注解可以方便获取cookies
+public void saves17(@RequestHeader(value = "User-Agent") String user_agent){
+    System.out.println(user_agent);
+}
+```
+
+##### 文件上传
+
+
+
+#### 请求数据乱码的问题
+
+在web.xml中配置一个全局过滤器
+
+```java
+<!--  配置一个全局过滤器-->
+  <filter>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>CharacterEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+```
+
+#### 常用一些注解
+
+参数绑定注解@requestParam：
+
+客户端访问：http://localhost:8989/quick14?name=李四
+
+```java
+//参数绑定注解@RequestParam
+@RequestMapping("/quick14")
+@ResponseBody
+public void saves14(@RequestParam("name") String username)  {
+    System.out.println(username);
+}
+```
+
+注解的参数         value：与请求参数 名称
+
+​							required：指定的请求参数是否必须包括，默认为true
+
+​							defaultValue ：当没有指定请求参数时，使用指定的默认值赋值
+
+#### 获得Restful风格的参数
+
+Restful是一种软件架构风格、设计风格，基于此风格设计的软件可以更简洁、更有层次、更易于实现缓存机制。
+
+Restful风格的请求是使用“url+请求方式”表示一次请求目的，http协议里四个表示操作方式的动词：
+
+- GET ：获取资源                  eg ：/user/1  GET     得到id=1的user
+- POST：新建资源                 eg：/user     POST     新增user        
+- PUT：更新资源                    eg：/user/1  PUT     更新id=1的user
+- DELETE：删除资源             eg：/user/1   DELETE    删除id=1的user
+
+==地址/user/1可以写成/user/{id}，占位符在业务方法中可以使用@PathVariable注解进行占位符的匹配获取工作==
+
+```java
+//获得Restful风格的参数
+@RequestMapping(value = "/quick15/{name}",method = RequestMethod.GET)
+@ResponseBody
+public void saves15(@PathVariable(value = "name", required = true) String username){
+    System.out.println(username);
+}
+```
+
+#### 自定义类型转换器
+
+例如：日期类型的数据自定义转换
+
+1. 定义转换器类型实现Converter接口。
+
+   ```java
+   public class DateConverter implements Converter<String, Date> {
+       @Override
+       public Date convert(String dateStr) {
+           //将日期字符串转换成日期对象
+           SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+           Date date = null;
+           try {
+               date=format.parse(dateStr);
+           } catch (ParseException e) {
+               e.printStackTrace();
+           }
+           return date;
+       }
+   }
+   ```
+
+2. 在配置文件中声明转换器。
+
+   ```java
+   <!--    声明转换器，自定义类型变换使用-->
+       <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+           <property name="converters">
+               <list>
+                   <bean class="cn.xujian.converter.DateConverter"></bean>
+               </list>
+           </property>
+       </bean>
+   ```
+
+3. 在<annotation-driven>中引用转换器
+
+   ```java
+   <!--    MVC的注解驱动-->
+       <mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>
+   ```
+
+#### 

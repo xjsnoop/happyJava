@@ -9,6 +9,12 @@
 <!--Controller的组件扫描-->
     <context:component-scan base-package="cn.xujian.controller"></context:component-scan>
 
+<!--    MVC的注解驱动-->
+    <mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>
+<!--&lt;!&ndash;开发资源开放访问&ndash;&gt;-->
+<!--    <mvc:resources mapping="/js/**" location="/js/"></mvc:resources>-->
+<!--    如果spring找不到资源，交给原始的容器（tomcat）去找资源-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
 <!--&lt;!&ndash;    配置处理器映射器&ndash;&gt;-->
 <!--    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">-->
 <!--        <property name="messageConverters">-->
@@ -18,6 +24,12 @@
 <!--        </property>-->
 <!--    </bean>-->
 
-<!--    MVC的注解驱动-->
-    <mvc:annotation-driven></mvc:annotation-driven>
+<!--    声明转换器，自定义类型变换使用-->
+    <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
+        <property name="converters">
+            <list>
+                <bean class="cn.xujian.converter.DateConverter"></bean>
+            </list>
+        </property>
+    </bean>
 </beans>

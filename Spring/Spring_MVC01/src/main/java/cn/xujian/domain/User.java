@@ -24,4 +24,15 @@ public class User {
         this.username = username;
         this.age = age;
     }
+
+    public User() {
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", age=" + age +
+                '}';
+    }
 }
