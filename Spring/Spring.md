@@ -1661,4 +1661,103 @@ public void saves15(@PathVariable(value = "name", required = true) String userna
        <mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>
    ```
 
-#### 
+#### 文件上传
+
+文件上传客户端三要素：
+
+- 表单项  type=“file”
+
+- 表单提交方式为Post
+
+- 表单的enctype属性是多部分表单形式，即enctype="multipart/form-data"。
+
+  ```jsp
+  <body>
+      <form action="${pageContext.request.contextPath}/quick18" method="post" enctype="multipart/form-data">
+          名称<input type="text" name="username"><br/>
+          文件<input type="file" name="upload"><br/>
+          <input type="submit" value="提交">
+      </form>
+  </body>
+  ```
+
+==单文件上传步骤：==
+
+- 导入fileupload和io包
+
+  ```java
+  <!--    //文件上传相关包-->
+      <dependency>
+        <groupId>commons-fileupload</groupId>
+        <artifactId>commons-fileupload</artifactId>
+        <version>1.2.1</version>
+      </dependency>
+  <!--    //文件上传相关包-->
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.5</version>
+      </dependency>
+  ```
+
+- 配置文件上传解析器
+
+  ```java
+      <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+  <!--        上传文件总大小-->
+          <property name="maxUploadSize" value="5242800"></property>
+  <!--        上传文件单个大小-->
+          <property name="maxUploadSizePerFile" value="5242800"></property>
+  <!--        上传文件的编码类型-->
+          <property name="defaultEncoding" value="UTF-8"></property>
+      </bean>
+  ```
+
+- 编写文件上传代码
+
+  ```java
+  //文件上传
+  @RequestMapping("/quick18")
+  @ResponseBody
+  //此处的MultipartFile对象的名字要和表单上传文件的value值一样
+  public void fileUpload(String username, MultipartFile uploadFile) throws IOException {
+      System.out.println(username);
+      //获取文件名称
+      String originalFilename = uploadFile.getOriginalFilename();
+      System.out.println(originalFilename);
+      //保存文件
+      uploadFile.transferTo(new File("C:\\Users\\xj\\Desktop\\"+originalFilename));
+  }
+  ```
+
+==多文件上传==
+
+```jsp
+<form action="${pageContext.request.contextPath}/quick18" method="post" enctype="multipart/form-data">
+    名称<input type="text" name="username"><br/>
+    文件<input type="file" name="uploadFile"><br/>
+    文件<input type="file" name="uploadFile"><br/>
+    文件<input type="file" name="uploadFile"><br/>
+    文件<input type="file" name="uploadFile"><br/>
+    <input type="submit" value="提交">
+</form>
+```
+
+```java
+//多文件上传
+@RequestMapping("/quick19")
+@ResponseBody
+//此处的MultipartFile对象的名字要和表单上传文件的value值一样
+public void fileUploads(String username, MultipartFile[] uploadFile) throws IOException {
+    System.out.println(username);
+    //获取文件名称
+    for (MultipartFile multipartFile : uploadFile){
+        String originalFilename = multipartFile.getOriginalFilename();
+        if (!originalFilename.equals("")){
+            System.out.println(originalFilename);
+            //保存文件
+            multipartFile.transferTo(new File("C:\\Users\\xj\\Desktop\\"+originalFilename));
+        }
+    }
+}
+```

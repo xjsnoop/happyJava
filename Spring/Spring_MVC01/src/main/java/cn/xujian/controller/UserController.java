@@ -7,11 +7,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.crypto.Data;
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -158,6 +160,36 @@ public class UserController {
     //@RequestHeader注解的value对应请求头里的属性名
     public void saves17(@RequestHeader(value = "User-Agent") String user_agent){
         System.out.println(user_agent);
+    }
+
+    //单文件上传
+    @RequestMapping("/quick18")
+    @ResponseBody
+    //此处的MultipartFile对象的名字要和表单上传文件的value值一样
+    public void fileUpload(String username, MultipartFile uploadFile) throws IOException {
+        System.out.println(username);
+        //获取文件名称
+        String originalFilename = uploadFile.getOriginalFilename();
+        System.out.println(originalFilename);
+        //保存文件
+        uploadFile.transferTo(new File("C:\\Users\\xj\\Desktop\\"+originalFilename));
+    }
+
+    //多文件上传
+    @RequestMapping("/quick19")
+    @ResponseBody
+    //此处的MultipartFile对象的名字要和表单上传文件的value值一样
+    public void fileUploads(String username, MultipartFile[] uploadFile) throws IOException {
+        System.out.println(username);
+        //获取文件名称
+        for (MultipartFile multipartFile : uploadFile){
+            String originalFilename = multipartFile.getOriginalFilename();
+            if (!originalFilename.equals("")){
+                System.out.println(originalFilename);
+                //保存文件
+                multipartFile.transferTo(new File("C:\\Users\\xj\\Desktop\\"+originalFilename));
+            }
+        }
     }
 }
 

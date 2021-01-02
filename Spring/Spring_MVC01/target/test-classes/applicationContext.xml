@@ -27,6 +27,7 @@
     <bean id="userService" class="cn.xujian.service.Impl.UserServiceImpl">
         <property name="userDao" ref="userDao"></property>
     </bean>
+
 <!--    配置平台事务管理器-->
     <bean id="transactionManage" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource-druid"></property>

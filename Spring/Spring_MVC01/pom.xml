@@ -102,6 +102,18 @@
       <artifactId>jackson-annotations</artifactId>
       <version>2.11.2</version>
     </dependency>
+<!--    //文件上传相关包-->
+    <dependency>
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <version>1.2.1</version>
+    </dependency>
+<!--    //文件上传相关包-->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.5</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -116,7 +128,7 @@
           <version>2.1</version>
           <configuration>
             <!-- 通过maven tomcat7:run运行项目时，访问项目的端口号 -->
-            <port>9090</port>
+            <port>8989</port>
             <!-- 项目访问路径  本例：localhost:9090,  如果配置的aa， 则访问路径为localhost:9090/aa-->
             <path>/</path>
           </configuration>
