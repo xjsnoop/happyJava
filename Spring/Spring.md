@@ -1,4 +1,6 @@
-## Spring
+
+
+##  Spring
 
 ### spring是什么
 
@@ -13,9 +15,19 @@
 ### 快速开发步骤
 
 1. 导入Spring开发的包
-2. 编写Dao接口和实现类
-3. 创建Spring核心配置文件（放在resources中）
-4. 在Spring配置文件中配置UserDaoImpl    
+
+```java
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-context</artifactId>
+    <version>5.2.6.RELEASE</version>
+    <scope>compile</scope>
+</dependency>
+```
+
+1. 编写Dao接口和实现类
+2. 创建Spring核心配置文件（放在resources中）
+3. 在Spring配置文件中配置UserDaoImpl    
 
 ```java
 <bean id="userDao" class="cn.xujian.dao.impl.UserDaoImpl"></bean>
@@ -477,7 +489,7 @@ public void test4() throws SQLException {
 public void test5() throws SQLException {
     ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
     DataSource dataSource = (DataSource) applicationContext.getBean("dataSource-Druid");
-    Connection connection = dataSource.getConnection();
+    Connection connection = dataSource. getConnection();
     System.out.println(connection);
     connection.close();
 }
@@ -1321,7 +1333,7 @@ public String saves4(Model model){
 }
 ```
 
-##### 回写数据
+##### 回写数据 
 
 ###### 直接返回字符串
 
@@ -1377,6 +1389,8 @@ public String saves7() throws JsonProcessingException {
 ```java
 <!--    MVC的注解驱动-->
     <mvc:annotation-driven></mvc:annotation-driven>
+<!--    如果spring找不到资源，交给原始的容器（tomcat）去找资源-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
 ```
 
 可用==mvc的注解驱动==来替代==配置处理映射器==，达到相同的json转换效果
@@ -1505,6 +1519,7 @@ public void saves12(VO vo)  {
 ```java
 <!--&lt;!&ndash;开发资源开放访问&ndash;&gt;-->
 <!--    <mvc:resources mapping="/js/**" location="/js/"></mvc:resources>-->
+    
 <!--    如果spring找不到资源，交给原始的容器（tomcat）去找资源-->
     <mvc:default-servlet-handler></mvc:default-servlet-handler>
 ```
@@ -1650,6 +1665,7 @@ public void saves15(@PathVariable(value = "name", required = true) String userna
                <list>
                    <bean class="cn.xujian.converter.DateConverter"></bean>
                </list>
+                       
            </property>
        </bean>
    ```
@@ -1675,7 +1691,7 @@ public void saves15(@PathVariable(value = "name", required = true) String userna
   <body>
       <form action="${pageContext.request.contextPath}/quick18" method="post" enctype="multipart/form-data">
           名称<input type="text" name="username"><br/>
-          文件<input type="file" name="upload"><br/>
+          文件<input type="file" name="uploadFile"><br/>
           <input type="submit" value="提交">
       </form>
   </body>
@@ -1761,3 +1777,248 @@ public void fileUploads(String username, MultipartFile[] uploadFile) throws IOEx
     }
 }
 ```
+
+
+
+### SpringMVC拦截器
+
+类似与Servlet开发中的过滤器Filter，用于对处理器进行预处理和后处理。
+
+![image-20210415232621504](C:\Users\xj\AppData\Roaming\Typora\typora-user-images\image-20210415232621504.png)
+
+#### 快速入门
+
+- 创建拦截器类实现HandlerInterceptor接口
+
+```java
+public class MyInterceptor1 implements HandlerInterceptor {
+//    在目标方法执行之前执行
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        System.out.println("preHandle");
+        return false;
+    }
+//  在目标方法执行之后  视图返回之前执行
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        System.out.println("postHandle");
+    }
+//  在整个流程执行完毕后执行
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        System.out.println("afterCompletion");
+    }
+}
+```
+
+- 配置拦截器
+
+```java
+<!--    配置拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+<!--            对哪些资源执行拦截操作-->
+            <mvc:mapping path="/**"/>
+            <bean class="cn.xujian.interceptor.MyInterceptor1"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+```
+
+- 测试拦截的效果
+
+```java
+package cn.xujian.interceptor;
+
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class MyInterceptor1 implements HandlerInterceptor {
+//    在目标方法执行之前执行
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        System.out.println("preHandle");
+//        获取键param的值，如果值为yes则正确访问目标资源，其它则重定向到error.jsp
+        String param = request.getParameter("param");
+        if( "yes".equals(param)){
+            return true;
+        }else {
+            request.getRequestDispatcher("/error.jsp").forward(request,response);
+            return false;
+        }
+    }
+//  在目标方法执行之后  视图返回之前执行
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+//        对视图对象进行更改
+        modelAndView.addObject("name","已经把本来的xujian改成了徐健");
+        System.out.println("postHandle");
+    }
+//  在整个流程执行完毕后执行
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        System.out.println("afterCompletion");
+    }
+}
+```
+
+#### 案例     用户登陆权限控制
+
+需求：用户没有登陆情况下，不能对后台菜单进行访问，点击菜单跳转到登陆页面，只有登陆成功后才能进行后台功能的操作。
+
+- dao
+
+```java
+@Repository("managerDao")
+public class ManagerImpl implements ManagerDao {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Override
+    public Manager findByUsernameAndPassword(String username, String password) {
+        Manager manager;
+
+        try {
+            manager = jdbcTemplate.queryForObject("select * from sys_user where username=? and password=?", new BeanPropertyRowMapper<Manager>(Manager.class), username, password);
+        } catch (DataAccessException e) {
+            manager=null;
+        }
+        return manager;
+    }
+}
+```
+
+- service
+
+```java
+@Service("managerService")
+public class ManagerServiceImpl implements ManagerService {
+    @Autowired
+    private ManagerDao managerDao;
+    @Override
+    public Manager login(String username, String password) {
+        Manager manager = managerDao.findByUsernameAndPassword(username, password);
+        return manager;
+    }
+}
+```
+
+- interceptor
+
+```java
+public class LoginInterceptor implements HandlerInterceptor {
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+//        判断用户是否登陆   （判断session中有没有manager）
+        HttpSession session = request.getSession();
+        Manager manager = (Manager) session.getAttribute("manager");
+//            没有登陆
+        if (manager==null){
+            response.sendRedirect(request.getContextPath()+"/login.jsp");
+            return false;
+        }
+        return true;
+    }
+}
+```
+
+- controller
+
+```java
+@Controller
+public class ManagerController {
+
+    @Autowired
+    private ManagerService managerService;
+    @RequestMapping("/login")
+    public String login (String username, String password, HttpSession session){
+        Manager manager = managerService.login(username, password);
+//        密码和账户对应
+        if (manager!=null){
+            session.setAttribute("manager",manager);
+
+            return "redirect:/index01.jsp";
+        }
+        return "/login.jsp";
+    }
+    @RequestMapping("/quick1")
+    public String quick1(){
+        return "/quick1.jsp";
+    }
+}
+```
+
+- .xml配置文件
+
+```java
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <import resource="spring-mvc.xml"></import>
+<!--    读取配置文件-->
+    <context:property-placeholder location="classpath:jdbc.properties"></context:property-placeholder>
+<!--    组件扫描-->
+    <context:component-scan base-package="cn.xujian"></context:component-scan>
+<!--    注入数据库连接池-->
+    <bean id="dataSource-druid" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"></property>
+        <property name="url" value="${jdbc.url}"></property>
+        <property name="username" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+<!--    注入jdbc模板类-->
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource-druid"></property>
+    </bean>
+<!--    配置平台事务管理器-->
+    <bean id="transactionManage" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource-druid"></property>
+    </bean>
+<!--    事务的注解驱动-->
+    <tx:annotation-driven transaction-manager="transactionManage"></tx:annotation-driven>
+
+</beans>
+```
+
+```java
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+<!--Controller的组件扫描-->
+    <context:component-scan base-package="cn.xujian.controller"></context:component-scan>
+
+<!--    MVC的注解驱动-->
+    <mvc:annotation-driven ></mvc:annotation-driven>
+
+<!--    如果spring找不到资源，交给原始的容器（tomcat）去找资源-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+
+
+<!--    配置拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+<!--            对哪些资源执行拦截操作-->
+            <mvc:mapping path="/**"/>
+<!--            对哪些资源放开拦截-->
+            <mvc:exclude-mapping path="/login"/>
+            <bean class="cn.xujian.interceptor.LoginInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+</beans>
+```
+
+#### SpringMVC的异常处理机制
+

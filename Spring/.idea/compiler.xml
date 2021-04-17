@@ -8,15 +8,20 @@
         <outputRelativeToContentRoot value="true" />
         <module name="Spring_transaction_tx_anno" />
         <module name="Spring_ioc" />
-        <module name="Spring_MVC01" />
         <module name="spring_ioc_anno" />
+        <module name="Spring_exception_test" />
         <module name="Spring_Transaction" />
         <module name="Spring_Jdbc" />
+        <module name="Spring_MVC01" />
         <module name="Spring_aop" />
+        <module name="Spring-interceptor-test" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="11">
+      <module name="Spring-interceptor-test" target="1.7" />
       <module name="Spring_aop" target="1.7" />
+      <module name="Spring_exception_test" target="1.7" />
+      <module name="Spring_interceptor_test" target="1.7" />
       <module name="Spring_ioc" target="1.7" />
       <module name="spring_ioc_anno" target="1.7" />
       <module name="Spring_Jdbc" target="1.7" />

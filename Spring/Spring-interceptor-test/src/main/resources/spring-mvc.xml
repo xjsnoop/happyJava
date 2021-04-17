@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+<!--Controller的组件扫描-->
+    <context:component-scan base-package="cn.xujian.controller"></context:component-scan>
+
+<!--    MVC的注解驱动-->
+    <mvc:annotation-driven ></mvc:annotation-driven>
+
+<!--    如果spring找不到资源，交给原始的容器（tomcat）去找资源-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+
+
+<!--    配置拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+<!--            对哪些资源执行拦截操作-->
+            <mvc:mapping path="/**"/>
+<!--            对哪些资源放开拦截-->
+            <mvc:exclude-mapping path="/login"/>
+            <bean class="cn.xujian.interceptor.LoginInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+</beans>

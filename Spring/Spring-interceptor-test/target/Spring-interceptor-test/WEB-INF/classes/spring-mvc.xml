@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+<!--Controller的组件扫描-->
+    <context:component-scan base-package="cn.xujian.controller"></context:component-scan>
+
+<!--    MVC的注解驱动-->
+    <mvc:annotation-driven ></mvc:annotation-driven>
+<!--&lt;!&ndash;开发资源开放访问&ndash;&gt;-->
+<!--    <mvc:resources mapping="/js/**" location="/js/"></mvc:resources>-->
+<!--    如果spring找不到资源，交给原始的容器（tomcat）去找资源-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+<!--&lt;!&ndash;    配置处理器映射器&ndash;&gt;-->
+<!--    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">-->
+<!--        <property name="messageConverters">-->
+<!--            <list>-->
+<!--                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"></bean>-->
+<!--            </list>-->
+<!--        </property>-->
+<!--    </bean>-->
+
+<!--    配置拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+<!--            对哪些资源执行拦截操作-->
+            <mvc:mapping path="/**"/>
+<!--            对哪些资源放开拦截-->
+            <mvc:exclude-mapping path="/login"/>
+            <bean class="cn.xujian.interceptor.LoginInterceptor"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+</beans>

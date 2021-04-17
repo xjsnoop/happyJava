@@ -6,25 +6,25 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
                             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
                             http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
-<!--Controller的组件扫描-->
+    <!--Controller的组件扫描-->
     <context:component-scan base-package="cn.xujian.controller"></context:component-scan>
 
-<!--    MVC的注解驱动-->
+    <!--    MVC的注解驱动-->
     <mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>
-<!--&lt;!&ndash;开发资源开放访问&ndash;&gt;-->
-<!--    <mvc:resources mapping="/js/**" location="/js/"></mvc:resources>-->
-<!--    如果spring找不到资源，交给原始的容器（tomcat）去找资源-->
+    <!--&lt;!&ndash;开发资源开放访问&ndash;&gt;-->
+    <!--    <mvc:resources mapping="/js/**" location="/js/"></mvc:resources>-->
+    <!--    如果spring找不到资源，交给原始的容器（tomcat）去找资源-->
     <mvc:default-servlet-handler></mvc:default-servlet-handler>
-<!--&lt;!&ndash;    配置处理器映射器&ndash;&gt;-->
-<!--    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">-->
-<!--        <property name="messageConverters">-->
-<!--            <list>-->
-<!--                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"></bean>-->
-<!--            </list>-->
-<!--        </property>-->
-<!--    </bean>-->
+    <!--&lt;!&ndash;    配置处理器映射器&ndash;&gt;-->
+    <!--    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">-->
+    <!--        <property name="messageConverters">-->
+    <!--            <list>-->
+    <!--                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"></bean>-->
+    <!--            </list>-->
+    <!--        </property>-->
+    <!--    </bean>-->
 
-<!--    声明转换器，自定义类型变换使用-->
+    <!--    声明转换器，自定义类型变换使用-->
     <bean id="conversionService" class="org.springframework.context.support.ConversionServiceFactoryBean">
         <property name="converters">
             <list>
@@ -34,11 +34,20 @@
     </bean>
 
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-<!--        上传文件总大小-->
+        <!--        上传文件总大小-->
         <property name="maxUploadSize" value="5242800"></property>
-<!--        上传文件单个大小-->
+        <!--        上传文件单个大小-->
         <property name="maxUploadSizePerFile" value="5242800"></property>
-<!--        上传文件的编码类型-->
+        <!--        上传文件的编码类型-->
         <property name="defaultEncoding" value="UTF-8"></property>
     </bean>
+
+    <!--    配置拦截器-->
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <!--            对哪些资源执行拦截操作-->
+            <mvc:mapping path="/**"/>
+            <bean class="cn.xujian.interceptor.MyInterceptor1"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
 </beans>

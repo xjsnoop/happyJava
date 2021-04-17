@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/Spring-interceptor-test" />
+    <file type="web" url="file://$PROJECT_DIR$/Spring_exception_test" />
+    <file type="web" url="file://$PROJECT_DIR$/Spring_interceptor_test" />
     <file type="web" url="file://$PROJECT_DIR$/Spring_ioc" />
     <file type="web" url="file://$PROJECT_DIR$/spring_ioc_anno" />
     <file type="web" url="file://$PROJECT_DIR$/Spring_MVC01" />
@@ -18,6 +21,8 @@
         <option value="$PROJECT_DIR$/Spring_Transaction/pom.xml" />
         <option value="$PROJECT_DIR$/Spring_transaction_tx_anno/pom.xml" />
         <option value="$PROJECT_DIR$/Spring_MVC01/pom.xml" />
+        <option value="$PROJECT_DIR$/Spring-interceptor-test/pom.xml" />
+        <option value="$PROJECT_DIR$/Spring_exception_test/pom.xml" />
       </list>
     </option>
   </component>
