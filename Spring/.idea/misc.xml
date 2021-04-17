@@ -7,6 +7,7 @@
     <file type="web" url="file://$PROJECT_DIR$/Spring_ioc" />
     <file type="web" url="file://$PROJECT_DIR$/spring_ioc_anno" />
     <file type="web" url="file://$PROJECT_DIR$/Spring_MVC01" />
+    <file type="web" url="file://$PROJECT_DIR$/Spring_MVC_Test" />
   </component>
   <component name="JavaScriptSettings">
     <option name="languageLevel" value="ES6" />
@@ -23,6 +24,7 @@
         <option value="$PROJECT_DIR$/Spring_MVC01/pom.xml" />
         <option value="$PROJECT_DIR$/Spring-interceptor-test/pom.xml" />
         <option value="$PROJECT_DIR$/Spring_exception_test/pom.xml" />
+        <option value="$PROJECT_DIR$/Spring_MVC_Test/pom.xml" />
       </list>
     </option>
   </component>

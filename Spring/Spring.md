@@ -2138,11 +2138,8 @@ public class MyExceptionResolver implements HandlerExceptionResolver {
 
 - 编写异常页面
 
-
-
 - 在Spring_MVC中配置异常处理器
 
-  
 
 ```java
 <!--    配置自定义异常处理-->
@@ -2150,3 +2147,29 @@ public class MyExceptionResolver implements HandlerExceptionResolver {
 ```
 
 - 在controller中测试异常跳转
+
+### Spring项目练习
+
+#### Spring练习环境搭建
+
+1. 创建工程（Project&Module）
+2. 导入静态页面
+3. 导入需要的包
+4. 创建包结构（controller、service、dao、domain、utils）
+5. 导入数据库脚本
+6. 创建POJO类
+7. 创建配置文件（applicationContext.xml、spring-mvc.xml、jdbc.properties、log4j.properties）
+
+#### 角色列表的展示和添加操作
+
+1. 点击角色管理菜单发送请求到服务器端（修改角色管理菜单的url）
+2. 创建RoleController和showList（）方法
+3. 创建RoleService和showList（）方法
+4. 创建RoleDao和findAll（）方法
+5. 使用jdbcTemplate完成查询操作
+6. 将查询数据存储到Model中
+7. 转发到role-list.jsp页面进行展示
+
+#### 用户列表的展示和添加操作
+
+#### 删除用户操作
