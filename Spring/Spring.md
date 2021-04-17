@@ -2022,3 +2022,131 @@ public class ManagerController {
 
 #### SpringMVC的异常处理机制
 
+##### 异常处理思路
+
+系统中异常包括两类：预期异常和运行时异常RuntimeException，前者通过捕获异常从而获取异常信息，后者主要通过规范代码开发、测试等手段减少运行时异常的发生。
+
+系统的Dao、Service、Controller出现异常都通过throws Exception向上抛出，最后由SpringMVC前端控制器交由异常处理器进行异常处理，如下图：
+
+![image-20210417185932245](C:\Users\xj\AppData\Roaming\Typora\typora-user-images\image-20210417185932245.png) 
+
+
+
+##### 异常处理两种方式
+
+1.使用SpringMVC提供的简单异常处理器SimpleMappingExceptionResolver
+
+- 人为制造异常
+
+```java
+@Service("demoService")
+public class DemoServiceImpl implements DemoService {
+    @Override
+    public void show1() {
+        System.out.println("抛出类型转换异常");
+        Object str = "zhangshan";
+        Integer num = (Integer)str;
+    }
+
+    @Override
+    public void show2() {
+        System.out.println("抛出除零异常");
+        int i = 1/0;
+    }
+
+    @Override
+    public void show3() throws FileNotFoundException {
+        System.out.println("文件找不到异常");
+        InputStream in = new FileInputStream("c:/aaa.txt");
+    }
+
+    @Override
+    public void show4() {
+        System.out.println("空指针异常");
+        String str = null;
+        str.length();
+    }
+
+    @Override
+    public void show5() throws MyException {
+        System.out.println("自定义异常");
+        throw new MyException();
+    }
+}
+```
+
+- 在Spring_MVC.xml文件中配置简单异常处理
+
+```java
+<!--    配置简单异常处理器-->
+    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+        <property name="defaultErrorView" value="error2.jsp"></property>
+        <property name="exceptionMappings">
+            <map>
+                <entry key="cn.xujian.exception.MyException" value="error1.jsp"></entry>
+                <entry key="java.lang.ClassCastException" value="error.jsp"> </entry>
+            </map>
+        </property>
+    </bean>
+```
+
+- 在controller中测试异常跳转
+
+```java
+@Controller
+public class DemoController {
+    @Autowired
+    private DemoService demoService;
+    @RequestMapping("/show")
+    public String show() throws FileNotFoundException, MyException {
+        System.out.println("show Running.....");
+//        demoService.show1();
+        demoService.show2();
+//        demoService.show3();
+//        demoService.show4();
+//        demoService.show5();
+        return "/index.jsp";
+    }
+}
+```
+
+
+
+2.实现Spring的异常处理接口HandlerExceptionResolver
+
+- 创建异常处理器类实现HandlerExceptionResolver
+
+```java
+public class MyExceptionResolver implements HandlerExceptionResolver {
+    @Override
+//    参数Exception：异常对象
+//    返回值ModelAndView：跳转到错误视图的信息
+    public ModelAndView resolveException(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, Exception e) {
+        ModelAndView modelAndView = new ModelAndView();
+        if (e instanceof MyException){
+            modelAndView.addObject("info","自定义异常");
+        }else if (e instanceof ClassCastException){
+            modelAndView.addObject("info","类转换异常");
+        }else if (e instanceof NullPointerException){
+            modelAndView.addObject("info","空指针异常");
+        }
+        modelAndView.setViewName("/Myerror.jsp");
+        return modelAndView;
+    }
+}
+```
+
+- 编写异常页面
+
+
+
+- 在Spring_MVC中配置异常处理器
+
+  
+
+```java
+<!--    配置自定义异常处理-->
+    <bean class="cn.xujian.resolver.MyExceptionResolver"></bean>
+```
+
+- 在controller中测试异常跳转

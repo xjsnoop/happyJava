@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                            http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+<!--Controller的组件扫描-->
+    <context:component-scan base-package="cn.xujian.controller"></context:component-scan>
+
+<!--    MVC的注解驱动-->
+    <mvc:annotation-driven ></mvc:annotation-driven>
+
+<!--    如果spring找不到资源，交给原始的容器（tomcat）去找资源-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+
+<!--&lt;!&ndash;    配置简单异常处理器&ndash;&gt;-->
+<!--    <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">-->
+<!--        <property name="defaultErrorView" value="error2.jsp"></property>-->
+<!--        <property name="exceptionMappings">-->
+<!--            <map>-->
+<!--                <entry key="cn.xujian.exception.MyException" value="error1.jsp"></entry>-->
+<!--                <entry key="java.lang.ClassCastException" value="error.jsp"> </entry>-->
+<!--            </map>-->
+<!--        </property>-->
+<!--    </bean>-->
+
+<!--    配置自定义异常处理-->
+    <bean class="cn.xujian.resolver.MyExceptionResolver"></bean>
+
+</beans>
