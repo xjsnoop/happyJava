@@ -1,0 +1,12 @@
+cn\xujian\service\UserService.class
+cn\xujian\service\RoleService.class
+cn\xujian\dao\impl\UserDaoImpl.class
+cn\xujian\domain\User.class
+cn\xujian\dao\RoleDao.class
+cn\xujian\dao\impl\RoleDaoImpl.class
+cn\xujian\controller\RoleController.class
+cn\xujian\domain\Role.class
+cn\xujian\service\impl\UserServiceImpl.class
+cn\xujian\controller\UserController.class
+cn\xujian\dao\UserDao.class
+cn\xujian\service\impl\RoleServiceImpl.class

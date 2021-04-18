@@ -2170,6 +2170,40 @@ public class MyExceptionResolver implements HandlerExceptionResolver {
 6. 将查询数据存储到Model中
 7. 转发到role-list.jsp页面进行展示
 
+- 注意数据提交到数据库乱码问题：在web.xml中配置过滤器
+
+
+
 #### 用户列表的展示和添加操作
+
+```java
+    @Override
+    public List<User> showUser() {
+        List<User> userList = userDao.findAllUser();
+        for (User user : userList){
+//            获取user的id
+            Long id = user.getId();
+            List<Role> roles = roleDao.findRoleById(id);
+            user.setRoles(roles);
+        }
+        return userList;
+    }
+```
+
+```java
+@Override
+public List<User> findAllUser() {
+    List<User> userList = jdbcTemplate.query("select * from sys_user",new BeanPropertyRowMapper<User>(User.class));
+    return userList;
+}
+```
+
+```java
+@Override
+public List<Role> findRoleById(Long id) {
+    List<Role> roles = jdbcTemplate.query("select * from sys_user_role ur , sys_role r where ur.roleId = r.id and ur.userId = ?", new BeanPropertyRowMapper<Role>(Role.class), id);
+    return roles;
+}
+```
 
 #### 删除用户操作

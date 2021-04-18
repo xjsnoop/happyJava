@@ -22,4 +22,9 @@ public class RoleController {
         modelAndView.setViewName("role-list");
         return modelAndView;
     }
+    @RequestMapping("/addRole")
+    public String addRole(Role role){
+        roleService.addRole(role);
+        return "redirect:/role/list";
+    }
 }
