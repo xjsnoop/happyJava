@@ -7,4 +7,7 @@ import java.util.List;
 public interface UserService {
     List<User> showUser();
 
+    void save(User user, long[] roleIDs);
+
+    void delUser(long userId);
 }

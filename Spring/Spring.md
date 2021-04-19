@@ -2207,3 +2207,60 @@ public List<Role> findRoleById(Long id) {
 ```
 
 #### 删除用户操作
+
+- jsp
+
+```java
+<script>
+   function delUser(userId) {
+      if (confirm("您确认要删除吗")){
+         location.href="${pageContext.request.contextPath}/user/del/"+userId;
+      }
+   }
+</script>
+    
+    
+```
+
+```java
+<td class="text-center">
+   <a href="javascript:void(0);" onclick="delUser('${user.id}')" class="btn bg-olive btn-xs">删除</a>
+</td>
+```
+
+- controller
+
+```java
+//    删除单条user数据
+    @RequestMapping("/del/{userId}")
+    public String delUser(@PathVariable("userId") long userId){
+        userService.delUser(userId);
+        return "redirect:/user/list";
+    }
+```
+
+userServiceImpl
+
+```java
+    @Override
+    public void delUser(long userId) {
+//        删除关系表相关数据
+        userDao.delUserRoleRel(userId);
+//        删除user表相关数据
+        userDao.delUserById(userId);
+    }
+```
+
+userDaoImpl
+
+```java
+@Override
+public void delUserRoleRel(long userId) {
+    jdbcTemplate.update("delete from sys_user_role where userId = ?",userId);
+}
+
+@Override
+public void delUserById(long userId) {
+    jdbcTemplate.update("delete from sys_user where id = ?",userId);
+}
+```
