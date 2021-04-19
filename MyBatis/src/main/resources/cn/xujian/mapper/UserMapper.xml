@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 将查询到的数据封装到user对象-->
+<mapper namespace="userMapper">
+<!--    查询操作-->
+    <select id="findAll" resultType="cn.xujian.domain.User">
+        select * from user
+    </select>
+
+<!--    插入操作   此处为user对象内部的属性值-->
+    <insert id="save" parameterType="cn.xujian.domain.User">
+        insert into user values (#{id},#{username},#{password})
+    </insert>
+
+<!--    修改数据操作-->
+    <update id="update" parameterType="cn.xujian.domain.User">
+        update user set username = #{username} ,password = #{password} where id = #{id}
+    </update>
+
+<!--    删除操作,根据id删除-->
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from user where id = #{id}
+    </delete>
+</mapper>

@@ -2264,3 +2264,203 @@ public void delUserById(long userId) {
     jdbcTemplate.update("delete from sys_user where id = ?",userId);
 }
 ```
+
+### Mybatis学习
+
+##### 快速入门
+
+1. 添加MyBatis的jar包
+
+   ```java
+   <dependency>
+     <groupId>mysql</groupId>
+     <artifactId>mysql-connector-java</artifactId>
+     <version>5.1.49</version>
+   </dependency>
+   
+   <!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
+   <dependency>
+     <groupId>org.mybatis</groupId>
+     <artifactId>mybatis</artifactId>
+     <version>3.4.6</version>
+   </dependency>
+   ```
+
+2. 创建user数据表
+
+3. 编写User实体类
+
+4. 编写映射文件UserMapper.xml
+
+   ```java
+   <?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   <!-- 将查询到的数据封装到user对象-->
+   <mapper namespace="userMapper">
+       <select id="findAll" resultType="cn.xujian.domain.User">
+           select * from user
+       </select>
+   </mapper>
+   ```
+
+5. 编写核心文件SqlMapConfig.xml
+
+   ```java
+   <?xml version="1.0" encoding="UTF-8" ?>
+   <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+   <configuration>
+   
+   <!--    配置数据源的环境-->
+       <environments default="developement">
+           <environment id="developement">
+               <transactionManager type="JDBC"></transactionManager>
+               <dataSource type="POOLED">
+                   <property name="driver" value="com.mysql.jdbc.Driver"/>
+                   <property name="url" value="jdbc:mysql://localhost:3306/test"/>
+                   <property name="username" value="root"/>
+                   <property name="password" value="xj"/>
+               </dataSource>
+           </environment>
+       </environments>
+   
+   <!--    加载映射文件-->
+       <mappers>
+           <mapper resource="cn/xujian/mapper/UserMapper.xml"></mapper>
+       </mappers>
+   </configuration>
+   ```
+
+6. 编写测试类
+
+   ```java
+       @Test
+       public void test01() throws IOException {
+   //        获得核心配置文件
+           InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapConfig.xml");
+   //        获取session工厂对象
+           SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+   //        获取session会话对象
+           SqlSession sqlSession = sqlSessionFactory.openSession();
+   //        执行操作 参数：命名空件+id
+           List<User> userList = sqlSession.selectList("userMapper.findAll");
+   //        打印数据
+           System.out.println(userList);
+   //        释放资源
+           sqlSession.close();
+       }
+   ```
+
+
+
+##### 映射文件概述
+
+![image-20210419201355005](C:\Users\xj\AppData\Roaming\Typora\typora-user-images\image-20210419201355005.png)
+
+##### 增删改查操作
+
+插入操作：
+
+```java
+<!--    插入操作   此处为user对象内部的属性值-->
+    <insert id="save" parameterType="cn.xujian.domain.User">
+        insert into user values (#{id},#{username},#{password})
+    </insert>
+```
+
+```java
+//    增加数据
+    @Test
+    public void test02() throws IOException {
+//        模拟user对象
+        User user = new User();
+        user.setUsername("tom");
+        user.setPassword("hahaha");
+//        获得核心配置文件
+        InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapConfig.xml");
+//        获取session工厂对象
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+//        获取session会话对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+//        执行操作 参数：命名空间+id
+        sqlSession.insert("userMapper.save",user);
+//        mybatis执行更新操作，必须提交事务
+        sqlSession.commit();
+//        释放资源
+        sqlSession.close();
+    }
+```
+
+修改数据：
+
+```java
+<!--    修改数据操作-->
+    <update id="update" parameterType="cn.xujian.domain.User">
+        update user set username = #{username} ,password = #{password} where id = #{id}
+    </update>
+```
+
+```java
+    //    修改数据
+    @Test
+    public void test03() throws IOException {
+//        模拟user对象
+        User user = new User();
+        user.setId(6);
+        user.setUsername("tomDad");
+        user.setPassword("123");
+//        获得核心配置文件
+        InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapConfig.xml");
+//        获取session工厂对象
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+//        获取session会话对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+//        执行操作 参数：命名空间+id
+        sqlSession.update("userMapper.update",user);
+//        mybatis执行更新操作，必须提交事务
+        sqlSession.commit();
+//        释放资源
+        sqlSession.close();
+    }
+```
+
+删除操作：
+
+```java
+<!--    删除操作,根据id删除-->
+    <delete id="delete" parameterType="java.lang.Integer">
+        delete from user where id = #{id}
+    </delete>
+```
+
+```java
+    //    删除数据操作
+    @Test
+    public void test04() throws IOException {
+
+//        获得核心配置文件
+        InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapConfig.xml");
+//        获取session工厂对象
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+//        获取session会话对象
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+//        执行操作 参数：命名空间+id
+        sqlSession.delete("userMapper.delete",6);
+//        mybatis执行更新操作，必须提交事务
+        sqlSession.commit();
+//        释放资源
+        sqlSession.close();
+    }
+```
+
+##### 核心配置文件概述
+
+![image-20210419210304836](C:\Users\xj\AppData\Roaming\Typora\typora-user-images\image-20210419210304836.png)
+
+![image-20210419210412839](C:\Users\xj\AppData\Roaming\Typora\typora-user-images\image-20210419210412839.png)
+
+properties可以用于引入配置文件
+
+```java
+<!--    加载外部properties文件-->
+    <properties resource="jdbc.properties"></properties>
+```
