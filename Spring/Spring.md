@@ -2464,3 +2464,96 @@ properties可以用于引入配置文件
 <!--    加载外部properties文件-->
     <properties resource="jdbc.properties"></properties>
 ```
+
+##### 动态SQL
+
+使用if标签来判断传入的对象某个值是否传入，有传入值才加入判断。
+
+```java
+<select id="findByCondition" parameterType="cn.xujian.domain.User" resultType="cn.xujian.domain.User">
+    select * from user
+    <where>
+        <if test="id!=0">
+            and id = #{id}
+        </if>
+        <if test="username!=null">
+            and username = #{username}
+        </if>
+        <if test="password!=null">
+            and password = #{password}
+        </if>
+    </where>
+</select>
+```
+
+测试代码
+
+```java
+    @Test
+    public void test01() throws IOException {
+        InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapperConfig.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+//模拟用户
+        User condition = new User();
+        condition.setId(5);
+        condition.setUsername("宇琴");
+        condition.setPassword("123456");
+
+        List<User> userList = mapper.findByCondition(condition);
+        System.out.println(userList);
+    }
+```
+
+
+
+<foreach>标签，循环执行sql的拼接操作，
+
+如：select * from user where id in (1,2,5)
+
+```java
+<select id="findByIds" resultType="user" parameterType="list">
+    select * from user
+    <where>
+        <foreach collection="list" open="id in(" close=")" item="id" separator="," >
+            #{id}
+        </foreach>
+    </where>
+</select>
+```
+
+测试用例
+
+```java
+//    <foreach>测试用例
+    @Test
+    public void test02() throws IOException {
+        InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapperConfig.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+//       模拟测试数据
+        List<Integer> ids = new ArrayList<Integer>();
+        ids.add(3);
+        ids.add(5);
+        ids.add(6);
+
+        List<User> userList = mapper.findByIds(ids);
+        System.out.println(userList);
+
+    }
+```
+
+<sql>中可将重复的sql提取出来，使用时用include引用，最终达到sql重用的目的
+
+```java
+<!--    使用sql片段抽取-->
+<sql id="selectUser">select * from user</sql>
+```
+
+```java
+<include refid="selectUser"></include>
+```
