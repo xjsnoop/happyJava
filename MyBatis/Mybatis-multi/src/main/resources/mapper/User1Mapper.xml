@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xujian.mapper.User1Mapper">
+    <resultMap id="userRoleMap" type="user1">
+        <id column="userId" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="email" property="email"></result>
+        <result column="password" property="password"></result>
+        <collection property="roleList" ofType="role">
+            <id column="roleId" property="id"></id>
+            <result column="roleName" property="roleName"></result>
+            <result column="roleDesc" property="roleDesc"></result>
+        </collection>
+    </resultMap>
+    <select id="findUserAndRole" resultMap="userRoleMap">
+        select * from sys_user su ,sys_user_role sur ,sys_role sr where  su.id = sur.userId and sur.roleId = sr.id
+    </select>
+</mapper>

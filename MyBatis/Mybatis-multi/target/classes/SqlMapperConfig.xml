@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <typeAlias type="cn.xujian.domain.User" alias="user"></typeAlias>
+        <typeAlias type="cn.xujian.domain.Orders" alias="order"></typeAlias>
+        <typeAlias type="cn.xujian.domain.User1" alias="user1"></typeAlias>
+        <typeAlias type="cn.xujian.domain.Role" alias="role"></typeAlias>
+    </typeAliases>
+
+    <!--    注册类型处理器-->
+    <typeHandlers>
+        <typeHandler handler="cn.xujian.handler.DateTypeHandler"></typeHandler>
+    </typeHandlers>
+
+    <environments default="develop">
+        <environment id="develop">
+            <transactionManager type="JDBC"></transactionManager>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/test?useSSL=false"/>
+                <property name="username" value="root"/>
+                <property name="password" value="xj"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+        <mapper resource="mapper\UserMapper.xml"></mapper>
+        <mapper resource="mapper\OrderMapper.xml"></mapper>
+        <mapper resource="mapper\User1Mapper.xml"></mapper>
+    </mappers>
+</configuration>

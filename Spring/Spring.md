@@ -2714,3 +2714,234 @@ System.out.println("是否第一页："+pageInfo.isIsFirstPage());
 System.out.println("是否最后一页："+pageInfo.isIsLastPage());
 
 ```
+
+##### 多表操作
+
+###### 一对一查询
+
+用户表和订单的关系：一个用户有多个订单，一个订单只对应一个用户。需求：查询一个订单，同时查询所属的用户。
+
+方法1：
+
+```java
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xujian.mapper.OrderMapper">
+    <resultMap id="orderMap" type="order">
+<!--        手动指定字段与实体属性的对应关系-->
+        <id column="oid" property="id"></id>
+        <result column="ordertime" property="ordertime"></result>
+        <result column="total" property="total"></result>
+        <result column="uid" property="user.id"></result>
+        <result column="username" property="user.username"></result>
+        <result column="password" property="user.password"></result>
+    </resultMap>
+
+    <select id="findAll" resultMap="orderMap">
+        select * ,o.id oid from orders o ,user1 u where o.uid = u.id
+    </select>
+</mapper>
+```
+
+方法2：
+
+```java
+    <resultMap id="orderMap" type="order">
+<!--        手动指定字段与实体属性的对应关系-->
+        <id column="oid" property="id"></id>
+        <result column="ordertime" property="ordertime"></result>
+        <result column="total" property="total"></result>
+<!--        <result column="uid" property="user.id"></result>-->
+<!--        <result column="username" property="user.username"></result>-->
+<!--        <result column="password" property="user.password"></result>-->
+
+<!--      property :当前实体（order）中的属性名称（private User user）
+          javaType：当前实体（order）中的属性类型（User），因为定义了别名，写user。
+-->
+
+        <association property="user" javaType="user">
+            <id column="uid" property="id"></id>
+            <result column="username" property="username"></result>
+            <result column="password" property="password"></result>
+        </association>
+```
+
+```java
+public class Orders {
+    private int id;
+    private Date ordertime;
+    private double total;
+//    当前订单属于哪一个用户
+    private User user;
+    。。。。。。
+}
+```
+
+###### 一对多查询
+
+需求：查询一个用户，同时查询用户拥有的订单。
+
+```java
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xujian.mapper.UserMapper">
+    <resultMap id="userMap" type="user">
+        <id column="uid" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="password" property="password"></result>
+        <result column="birthday" property="birthday"></result>
+<!--        配置集合信息
+            property:集合的名称
+            ofType：当前集合中的数据类型
+    -->
+        <collection property="ordersList" ofType="order">
+<!--            封装order的数据-->
+            <id column="oid" property="id"></id>
+            <result column="ordertime" property="ordertime"></result>
+            <result column="total" property="total"></result>
+        </collection>
+    </resultMap>
+    <select id="findAll" resultMap="userMap">
+        select * ,o.id oid from user1 u ,orders o where u.id = o.uid
+    </select>
+</mapper>
+```
+
+```java
+public class User {
+    private int id;
+    private String username;
+    private String password;
+    private Date birthday;
+    private List<Orders> ordersList;
+    。。。。。。
+}
+```
+
+```java
+//    测试一对多查询
+    @Test
+    public void test02() throws IOException {
+        InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapperConfig.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+
+        List<User> userList = mapper.findAll();
+        System.out.println(userList);
+        sqlSession.close();
+    }
+```
+
+###### 多对多查询
+
+用户表和角色表的关系为，一个用户有多个角色，一个角色被多个用户使用。
+
+需求：查询用户同时查询查询出该用户的所有角色。
+
+```java
+public class User1 {
+    private int id;
+    private String username;
+    private String password;
+    private String email;
+
+    private List<Role> roleList;
+    。。。。。。。。
+}
+```
+
+```java
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xujian.mapper.User1Mapper">
+    <resultMap id="userRoleMap" type="user1">
+        <id column="userId" property="id"></id>
+        <result column="username" property="username"></result>
+        <result column="email" property="email"></result>
+        <result column="password" property="password"></result>
+        <collection property="roleList" ofType="role">
+            <id column="roleId" property="id"></id>
+            <result column="roleName" property="roleName"></result>
+            <result column="roleDesc" property="roleDesc"></result>
+        </collection>
+    </resultMap>
+    <select id="findUserAndRole" resultMap="userRoleMap">
+        select * from sys_user su ,sys_user_role sur ,sys_role sr where  su.id = sur.userId and sur.roleId = sr.id
+    </select>
+</mapper>
+```
+
+```java
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <typeAliases>
+        <typeAlias type="cn.xujian.domain.User" alias="user"></typeAlias>
+        <typeAlias type="cn.xujian.domain.Orders" alias="order"></typeAlias>
+        <typeAlias type="cn.xujian.domain.User1" alias="user1"></typeAlias>
+        <typeAlias type="cn.xujian.domain.Role" alias="role"></typeAlias>
+    </typeAliases>
+
+    <!--    注册类型处理器-->
+    <typeHandlers>
+        <typeHandler handler="cn.xujian.handler.DateTypeHandler"></typeHandler>
+    </typeHandlers>
+
+    <environments default="develop">
+        <environment id="develop">
+            <transactionManager type="JDBC"></transactionManager>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/test?useSSL=false"/>
+                <property name="username" value="root"/>
+                <property name="password" value="xj"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <mappers>
+        <mapper resource="mapper\UserMapper.xml"></mapper>
+        <mapper resource="mapper\OrderMapper.xml"></mapper>
+        <mapper resource="mapper\User1Mapper.xml"></mapper>
+    </mappers>
+</configuration>
+```
+
+```java
+//    测试多对多查询
+@Test
+public void test03() throws IOException {
+    InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapperConfig.xml");
+    SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+    SqlSession sqlSession = sqlSessionFactory.openSession();
+    User1Mapper mapper = sqlSession.getMapper(User1Mapper.class);
+
+    List<User1> userAndRole = mapper.findUserAndRole();
+    System.out.println(userAndRole);
+    sqlSession.close();
+}
+```
+
+##### Mybatis注解开发
+
+常用注解
+
+@Insert：实现新增
+
+@Update：实现更新
+
+@Delete：实现删除
+
+@Select：实现查询
+
+@Result：实现结果集封装
+
+@Results：可以与@Result 一起使用，封装多个结果集
+
+@One：实现一对一结果集封装
+
+@Many：实现一对多结果集封装
+
+###### Mybatis的增删改查，使用注解
+
