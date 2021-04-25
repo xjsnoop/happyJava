@@ -2557,3 +2557,160 @@ properties可以用于引入配置文件
 ```java
 <include refid="selectUser"></include>
 ```
+
+
+
+##### Mybatis的核心配置详讲
+
+###### typeHandlers标签
+
+可以重写类型处理器或创建自己的类型处理器来处理不支持的或非标准的类型。具体为:实现org.apache.ibatis.type.TypeHandler接口或继承BaseTypeHandler类。
+
+基本步骤：
+
+1. 定义转换继承类BaseTypeHandler<>
+2. 覆盖4个未实现的方法，其中setNonNullParameter为java程序设置数据到数据库的回调方法，getNullableResult为查询时 mysql的字符串类型转换成 java的Type类型的方法
+
+3. 在MyBatis核心配置文件中进行注册
+4. 测试转换是否正确
+
+```java
+public class DateTypeHandler extends BaseTypeHandler<Date> {
+//	  将java类型转换成数据库需要的类型
+    @Override
+    public void setNonNullParameter(PreparedStatement preparedStatement, int i, Date date, JdbcType jdbcType) throws SQLException {
+        long time = date.getTime();
+        preparedStatement.setLong(i,time);
+    }
+//    将数据库中的类型转换为java类型
+//    string s 为数据库中要转换的字段名称
+//    resultSet为查询出的结果集
+    @Override
+    public Date getNullableResult(ResultSet resultSet, String s) throws SQLException {
+//    将获取的结果集中需要的数据（long）转换后date类型返回
+        long aLong = resultSet.getLong(s);
+        Date date = new Date(aLong);
+        return date;
+    }
+    //将数据库中的类型转换为java类型
+    @Override
+    public Date getNullableResult(ResultSet resultSet, int i) throws SQLException {
+        long aLong = resultSet.getLong(i);
+        Date date = new Date(aLong);
+        return date;
+    }
+    //将数据库中的类型转换为java类型
+    @Override
+    public Date getNullableResult(CallableStatement callableStatement, int i) throws SQLException {
+        long aLong = callableStatement.getLong(i);
+        Date date = new Date(aLong);
+        return date;
+    }
+}
+```
+
+```java
+<!--    注册类型处理器-->
+    <typeHandlers>
+        <typeHandler handler="cn.xujian.handler.DateTypeHandler"></typeHandler>
+    </typeHandlers>
+```
+
+```java
+public class MybatisTest {
+    @Test
+    public void test01() throws IOException {
+        InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapperConfig.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+//        模拟user
+        User user = new User();
+        user.setUsername("小贱贱");
+        user.setPassword("123hhh");
+        user.setBirthday(new Date());
+
+        mapper.save(user);
+        sqlSession.commit();
+        sqlSession.close();
+    }
+
+    @Test
+    public void test02() throws IOException {
+        InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapperConfig.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+        List<User> userList = mapper.findAll();
+        System.out.println(userList);
+    }
+}
+```
+
+######  plugins标签
+
+MyBatis可以使用第三方的插件来对功能进行扩展，分页助手PageHelper是将分页的复杂操作进行封装，使用简单的方式即可获得分页的相关数据
+
+开发步骤：
+
+①导入通用PageHelper的坐标
+
+②在mybatis核心配置文件中配置PageHelper插件
+
+③测试分页数据获取
+
+```java
+<!-- https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper -->
+<dependency>
+  <groupId>com.github.pagehelper</groupId>
+  <artifactId>pagehelper</artifactId>
+  <version>3.7.5</version>
+</dependency>
+<dependency>
+  <groupId>com.github.jsqlparser</groupId>
+  <artifactId>jsqlparser</artifactId>
+  <version>0.9.1</version>
+</dependency>
+```
+
+```java
+<!--    配置分页助手插件-->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageHelper">
+<!--            指定方言-->
+            <property name="dialect" value="mysql"/>
+        </plugin>
+```
+
+```java
+//    分页插件的测试
+    @Test
+    public void test03() throws IOException {
+        InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapperConfig.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        UserMapper mapper = sqlSession.getMapper(UserMapper.class);
+//        设置分页相关参数，当前页+每页显示的条数
+        PageHelper.startPage(1,3);
+
+        List<User> userList = mapper.findAll();
+        for (User user :userList){
+            System.out.println(user);
+        }
+        sqlSession.close();
+    }
+```
+
+**获得分页相关的其他参数**
+
+```java
+//其他分页的数据
+PageInfo<User> pageInfo = new PageInfo<User>(select);
+System.out.println("总条数："+pageInfo.getTotal());
+System.out.println("总页数："+pageInfo.getPages());
+System.out.println("当前页："+pageInfo.getPageNum());
+System.out.println("每页显示长度："+pageInfo.getPageSize());
+System.out.println("是否第一页："+pageInfo.isIsFirstPage());
+System.out.println("是否最后一页："+pageInfo.isIsLastPage());
+
+```
