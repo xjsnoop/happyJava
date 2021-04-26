@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+<!--    自定义别名-->
+
+
+<!--    注册类型处理器-->
+
+
+<!--    配置分页助手插件-->
+
+
+    <environments default="develop">
+        <environment id="develop">
+            <transactionManager type="JDBC"></transactionManager>
+            <dataSource type="POOLED">
+                <property name="driver" value="com.mysql.jdbc.Driver"/>
+                <property name="url" value="jdbc:mysql://localhost:3306/test?useSSL=false"/>
+                <property name="username" value="root"/>
+                <property name="password" value="xj"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+<!--    加载映射关系 TODO-->
+    <mappers>
+<!--        指定接口所在的包-->
+        <package name="cn.xujian.mapper"/>
+    </mappers>
+</configuration>

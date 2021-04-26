@@ -2945,3 +2945,212 @@ public void test03() throws IOException {
 
 ###### Mybatis的增删改查，使用注解
 
+```java
+<!--    加载映射关系 TODO-->
+    <mappers>
+<!--        指定接口所在的包-->
+        <package name="cn.xujian.mapper"/>
+    </mappers>
+```
+
+```java
+public interface UserMapper {
+    @Insert("insert into user values(#{id},#{username},#{password})")
+    public void save(User user);
+    @Update("update user set username=#{username},password=#{password} where id=#{id}")
+    public void update(User user);
+    @Delete("delete from user where id=#{id}")
+    public void delete(int id);
+    @Select("select * from user where id=#{id}")
+    public User findById(int id);
+    @Select("select * from user")
+    public List<User> findAll();
+}
+```
+
+
+
+```java
+public class MybatisTest {
+
+    private UserMapper mapper;
+
+    @Before
+    public void before() throws IOException {
+        InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapperConfig.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        mapper = sqlSession.getMapper(UserMapper.class);
+    }
+//    增
+    @Test
+    public void testSave(){
+        User user = new User();
+        user.setUsername("小贱贱");
+        user.setPassword("abc");
+        mapper.save(user);
+    }
+//    改
+    @Test
+    public void tsetUpdate(){
+        User user = new User();
+        user.setId(11);
+        user.setUsername("小贱");
+        user.setPassword("abc");
+        mapper.update(user);
+    }
+//    删
+    @Test
+    public void tsetDelete(){
+        mapper.delete(11);
+    }
+//    查
+    @Test
+    public void tsetFindById(){
+        User user = mapper.findById(8);
+        System.out.println(user);
+    }
+
+    @Test
+    public void tsetFindAll(){
+        List<User> userList = mapper.findAll();
+        System.out.println(userList);
+    }
+}
+```
+
+###### 实现复杂查询
+
+使用@Results注解，@Result注解，@One注解，@Many注解组合完成复杂关系的配置
+
+![](D:/Develop/Spring学习课件笔记/3-4 就业课(2.1)-Mybatis/3-4 就业课(2.1)-Mybatis/03-Mybatis的多表操作/笔记/img/图片10.png)
+
+![](D:/Develop/Spring学习课件笔记/3-4 就业课(2.1)-Mybatis/3-4 就业课(2.1)-Mybatis/03-Mybatis的多表操作/笔记/img/图片11.png)
+
+**一对一查询封装**
+
+方法1：
+
+```java
+public interface OrderMapper {
+    @Select("select * ,o.id oid from orders o, user1 u where o.uid = u.id")
+    @Results({
+            @Result(column = "oid",property = "id"),
+            @Result(column = "ordertime",property = "ordertime"),
+            @Result(column = "total",property = "total"),
+            @Result(column = "uid",property = "user.id"),
+            @Result(column = "username",property = "user.username"),
+            @Result(column = "password",property = "user.password")
+    })
+    public List<Orders> findAll();
+```
+
+测试
+
+```java
+    private OrderMapper mapper;
+
+    @Before
+    public void before() throws IOException {
+        InputStream resourceAsStream = Resources.getResourceAsStream("SqlMapperConfig.xml");
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(resourceAsStream);
+        SqlSession sqlSession = sqlSessionFactory.openSession(true);
+        mapper = sqlSession.getMapper(OrderMapper.class);
+    }
+
+//    一对一查询注解封装测试
+    @Test
+    public void tset1(){
+        List<Orders> ordersList = mapper.findAll();
+        System.out.println(ordersList);
+    }
+```
+
+方法二：
+
+```java
+@Select("select * from orders")
+@Results({
+        @Result(column = "oid",property = "id"),
+        @Result(column = "ordertime",property = "ordertime"),
+        @Result(column = "total",property = "total"),
+        @Result(
+                property = "user" , //要封装的属性名称
+                column = "uid",     //根据哪个字段取查询user表的数据
+                javaType = User.class,  //要封装的实体类型
+                //select属性  代表查询那个接口的方法获得数据
+                one = @One(select = "cn.xujian.mapper.UserMapper.findById")
+        )
+})
+public List<Orders> findAll02();
+```
+
+
+
+**一对多查询**
+
+```java
+@Select("select * from user")
+@Results({
+        @Result(id =true, column = "id" ,property = "id"),
+        @Result(column = "username",property = "username"),
+        @Result(column = "password",property = "password"),
+        @Result(
+                property = "ordersList",
+                column = "id",
+                javaType = List.class,
+                many = @Many(select = "cn.xujian.mapper.OrderMapper.findByUid")
+        )
+})
+public List<User> findUserAndOrder();
+```
+
+```java
+@Select("select * from orders where uid=#{uid}")
+public List<Orders> findByUid(int uid);
+```
+
+```java
+//    使用注解的一对多查询
+    @Test
+    public void testFindUserAndOrder(){
+        List<User> userAndOrder = mapper.findUserAndOrder();
+        System.out.println(userAndOrder);
+    }
+```
+
+**多对多查询**
+
+```java
+//    多对多查询
+    @Select("select * from user")
+    @Results({
+            @Result(column = "id",property = "id"),
+            @Result(column = "username",property = "username"),
+            @Result(column = "password",property = "password"),
+            @Result(
+                    property = "roleList",
+                    column = "id",
+                    javaType = List.class,
+                    many = @Many(select = "cn.xujian.mapper.RoleMapper.findByUserId")
+            )
+    })
+    public List<User> findUserAndRole();
+```
+
+```java
+public interface RoleMapper {
+    @Select("select * from sys_user_role sur,sys_role sr where sur.roleId=sr.id and sur.userId=#{id} ")
+    public List<Role> findByUserId(int uid);
+}
+```
+
+```java
+//    使用注解的多对多查询
+    @Test
+    public void testFindUserAndRole(){
+        List<User> userAndRole = mapper.findUserAndRole();
+        System.out.println(userAndRole);
+    }
+```
+
