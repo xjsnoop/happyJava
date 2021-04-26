@@ -3154,3 +3154,46 @@ public interface RoleMapper {
     }
 ```
 
+### SSM框架整合
+
+#### 原始整合方式
+
+1. 导入maven坐标
+
+2. 编写实体类
+
+3. 编写mapper接口
+
+4. 编写service接口及service接口实现
+
+5. 编写Controller
+
+6. 编写添加页面和列表页面
+
+7. ##### 编写相应配置文件(文件参考目录：素材/配置文件)
+
+   •Spring配置文件：[applicationContext.xml](配置文件/applicationContext.xml)
+
+   •SprngMVC配置文件：[spring-mvc.xml](配置文件/spring-mvc.xml)
+
+   •MyBatis映射文件：[AccountMapper.xml](配置文件/AccountMapper.xml)
+
+   •MyBatis核心文件：[sqlMapConfig.xml](配置文件/sqlMapConfig.xml)
+
+   •数据库连接信息文件：[jdbc.properties](配置文件/jdbc.properties)
+
+   •Web.xml文件：[web.xml](配置文件/web.xml)
+
+   •日志文件：log4j.xml
+
+8. 测试
+
+#### Spring整合Mybatis
+
+1. 将SqlSessionFactory配置到Spring容器中
+2. 扫描Mapper，让Spring容器产生Mapper实现类
+3. 配置声明式事务控制
+4. 修改Service实现类代码
+
+**声明式事务控制**
+
