@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/MavenAndGit.iml" filepath="$PROJECT_DIR$/.idea/MavenAndGit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Mulit-Module-parent/Maven_dao/Maven_dao.iml" filepath="$PROJECT_DIR$/Mulit-Module-parent/Maven_dao/Maven_dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Mulit-Module-parent/Maven_pojo/Maven_pojo.iml" filepath="$PROJECT_DIR$/Mulit-Module-parent/Maven_pojo/Maven_pojo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Mulit-Module-parent/Maven_service/Maven_service.iml" filepath="$PROJECT_DIR$/Mulit-Module-parent/Maven_service/Maven_service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Mulit-Module-parent/Maven_web/Maven_web.iml" filepath="$PROJECT_DIR$/Mulit-Module-parent/Maven_web/Maven_web.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Mulit-Module-parent/Mulit-Module-parent.iml" filepath="$PROJECT_DIR$/Mulit-Module-parent/Mulit-Module-parent.iml" />
+    </modules>
+  </component>
+</project>
