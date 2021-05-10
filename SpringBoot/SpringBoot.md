@@ -683,12 +683,34 @@ public class UserServiceTest {
 **分析**：
 
 1. 添加启动器依赖；spring-boot-starter-data-redis
+
+   ```java
+   <!--        整合redis的依赖项-->
+           <dependency>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-starter-data-redis</artifactId>
+           </dependency>
+   ```
+
 2. 配置application.yml中修改redis的连接参数；（redis需要启动）
+
 3. 编写测试类应用RedisTemplate操作redis中的5种数据类型（string/hash/list/set/sorted set）
 
 **小结**：
 
 ```java
+package cn.xujian.redis;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
+import java.util.Set;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class RedisTest {
@@ -698,46 +720,40 @@ public class RedisTest {
 
     @Test
     public void test(){
-        //string 字符串
-        //redisTemplate.opsForValue().set("str", "heima");
-        redisTemplate.boundValueOps("str").set("xiaoxu");
+//        string字符串
+//        redisTemplate.opsForValue().set("str","xujian");
+        redisTemplate.boundValueOps("str").set("xujian");
         System.out.println("str = " + redisTemplate.opsForValue().get("str"));
-
-        //hash 散列
-        redisTemplate.boundHashOps("h_key").put("name", "xiaoxu");
-        redisTemplate.boundHashOps("h_key").put("age", 26);
-        //获取所有域
+//        hash散列
+        redisTemplate.boundHashOps("h_key").put("name","徐健");
+        redisTemplate.boundHashOps("h_key").put("age",13);
+        // 获取所有域
         Set set = redisTemplate.boundHashOps("h_key").keys();
-        System.out.println(" hash散列的所有域：" + set);
-        //获取所有值
+        System.out.println("hash散列的所有域：" + set);
+        //  获取所有值
         List list = redisTemplate.boundHashOps("h_key").values();
-        System.out.println(" hash散列的所有域的值：" + list);
-
-        //list 列表
+        System.out.println("hsah散列所有域的值：" + list);
+//        list列表
         redisTemplate.boundListOps("l_key").leftPush("c");
         redisTemplate.boundListOps("l_key").leftPush("b");
         redisTemplate.boundListOps("l_key").leftPush("a");
-        //获取全部元素
-        list = redisTemplate.boundListOps("l_key").range(0, -1);
-        System.out.println(" list列表中的所有元素：" + list);
+        List list1 = redisTemplate.boundListOps("l_key").range(0, -1);
+        System.out.println("list列表中的所有元素：" + list1);
+//        set集合
+        redisTemplate.boundSetOps("a_key").add("a","b","c");
+        Set set1 = redisTemplate.boundSetOps("a_key").members();
+        System.out.println("set集合所有元素 ： " + set1);
+//        sorted set 有序集合
+        redisTemplate.boundZSetOps("z_key").add("a",30);
+        redisTemplate.boundZSetOps("z_key").add("b",10);
+        redisTemplate.boundZSetOps("z_key").add("c",20);
+        Set set2 = redisTemplate.boundZSetOps("z_key").range(0, -1);
+        System.out.println("zset有序集合所有的元素 ： " + set2);
 
-        // set 集合
-        redisTemplate.boundSetOps("s_key").add("a", "b", "c");
-        set = redisTemplate.boundSetOps("s_key").members();
-        System.out.println(" set集合中的所有元素：" + set);
 
-        // sorted set 有序集合
-        redisTemplate.boundZSetOps("z_key").add("a", 30);
-        redisTemplate.boundZSetOps("z_key").add("b", 20);
-        redisTemplate.boundZSetOps("z_key").add("c", 10);
-        set = redisTemplate.boundZSetOps("z_key").range(0, -1);
-        System.out.println(" zset有序集合中的所有元素：" + set);
     }
 }
-
 ```
-
-
 
 ### 1.13    Spring Boot项目部署
 
@@ -766,10 +782,16 @@ public class RedisTest {
 
   
 
-- 部署运行
+- 部署运行  java -jar 包名
 
   ```sh
-  java -jar 包名
-  ```
-
+  在命令控制行运行java包
+  D:\Develop\happyJava\SpringBoot\Hello_SpringBoot\target>java -jar Hello_SpringBoot-1.0-SNAPSHOT.jar
+```
   
+  
+
+### 后续
+
+安装JBLSpringBootAppGen插件，可以右键项目名自动生成启动引导类application.java和application.yml配置文件。
+

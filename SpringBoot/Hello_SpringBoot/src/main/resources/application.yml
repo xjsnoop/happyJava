@@ -22,6 +22,9 @@ spring:
     url: jdbc:mysql://localhost:3306/springboot_test
     username: root
     password: xj
+  redis:
+    host: localhost
+    port: 6379
 
 mybatis:
 #  配置实体类别名包路径
